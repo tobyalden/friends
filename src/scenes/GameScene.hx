@@ -14,7 +14,6 @@ class GameScene extends Scene
     public override function begin()
     {
         add(new Level());
-        add(new PlayerOne(320, 240));
     }
 
 }

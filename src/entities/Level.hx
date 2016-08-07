@@ -7,6 +7,9 @@ import com.haxepunk.graphics.*;
 import com.haxepunk.HXP;
 import com.haxepunk.utils.Input;
 import com.haxepunk.utils.Key;
+import com.haxepunk.masks.*;
+import entities.*;
+
 
 class Level extends Entity
 {
@@ -14,20 +17,35 @@ class Level extends Entity
     public static inline var TILE_SIZE = 16;
     public static inline var LEVEL_WIDTH = 40;
     public static inline var LEVEL_HEIGHT = 30;
+    public static inline var LEVEL_SCALE = 8;
 
     private var map:Array<Array<Int>>;
     private var tiles:Tilemap;
-
+    
     public function new()
     {
         super(0, 0);
         map = [for (y in 0...LEVEL_HEIGHT) [for (x in 0...LEVEL_WIDTH) 0]];
         randomizeMap();
         tiles = new Tilemap("graphics/tiles.png", LEVEL_WIDTH*TILE_SIZE, LEVEL_HEIGHT*TILE_SIZE, TILE_SIZE, TILE_SIZE);
-        tiles.scale = 8;
-        generateMap();
+        tiles.scale = LEVEL_SCALE;
+        /*generateMap();*/
         tiles.loadFrom2DArray(map);
         graphic = tiles;
+
+        var collisionMask:Grid = new Grid(
+          LEVEL_SCALE * LEVEL_WIDTH * TILE_SIZE,
+          LEVEL_SCALE * LEVEL_HEIGHT * TILE_SIZE,
+          LEVEL_SCALE * TILE_SIZE,
+          LEVEL_SCALE * TILE_SIZE
+        );
+        collisionMask.loadFrom2DArray(map);
+        mask = collisionMask;
+        type = "walls";
+
+        var playerStart:Point = pickRandomOpenPoint();
+        HXP.scene.add(new PlayerOne(Math.floor(playerStart.x), Math.floor(playerStart.y)));
+        layer = 20;
     }
 
     public override function update()
@@ -340,6 +358,16 @@ class Level extends Entity
     {
       var randomPoint = new Point(Math.floor(Math.random()*LEVEL_WIDTH), Math.floor(Math.random()*LEVEL_HEIGHT));
       return randomPoint;
+    }
+
+    public function pickRandomOpenPoint()
+    {
+      var randomOpenPoint:Point = pickRandomPoint();
+      while(map[Math.round(randomOpenPoint.y)][Math.round(randomOpenPoint.x)] != 0)
+      {
+        randomOpenPoint = pickRandomPoint();
+      }
+      return randomOpenPoint;
     }
 
     public function createBoundaries()
