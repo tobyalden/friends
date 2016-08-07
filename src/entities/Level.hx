@@ -21,7 +21,8 @@ class Level extends Entity
 
     private var map:Array<Array<Int>>;
     private var tiles:Tilemap;
-    
+    private var collisionMask:Grid;
+
     public function new()
     {
         super(0, 0);
@@ -33,7 +34,7 @@ class Level extends Entity
         tiles.loadFrom2DArray(map);
         graphic = tiles;
 
-        var collisionMask:Grid = new Grid(
+        collisionMask = new Grid(
           LEVEL_SCALE * LEVEL_WIDTH * TILE_SIZE,
           LEVEL_SCALE * LEVEL_HEIGHT * TILE_SIZE,
           LEVEL_SCALE * TILE_SIZE,
@@ -44,7 +45,7 @@ class Level extends Entity
         type = "walls";
 
         var playerStart:Point = pickRandomOpenPoint();
-        HXP.scene.add(new PlayerOne(Math.floor(playerStart.x), Math.floor(playerStart.y)));
+        HXP.scene.add(new PlayerOne(Math.round(playerStart.x * LEVEL_SCALE * TILE_SIZE), Math.round(playerStart.y * LEVEL_SCALE * TILE_SIZE)));
         layer = 20;
     }
 
@@ -83,6 +84,7 @@ class Level extends Entity
         System.exit(0);
       }
       tiles.loadFrom2DArray(map);
+      collisionMask.loadFrom2DArray(map);
       super.update();
     }
 
