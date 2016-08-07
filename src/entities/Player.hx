@@ -42,7 +42,6 @@ class Player extends ActiveEntity
     private var isHoldingJump:Bool;
 
     private var lostInThought:Bool;
-    public var motherTimer:Float;
 
     public function new(x:Int, y:Int)
     {
@@ -58,15 +57,12 @@ class Player extends ActiveEntity
         invincibleTimer = 0;
         stunned = false;
         isHoldingJump = false;
-        lostInThought = false;
-        motherTimer = 0;
         sprite = new Spritemap("graphics/player.png", 32, 48);
         sprite.add("idle", [0]);
         sprite.add("walk", [6, 7, 8], 12);
         sprite.add("jump", [9]);
         sprite.add("spinjump", [2, 3, 4, 5], 12);
         sprite.add("hit", [2]);
-        sprite.add("lost_in_thought", [17]);
         sprite.play("idle");
         graphic = sprite;
         layer = -2550;
@@ -178,31 +174,6 @@ class Player extends ActiveEntity
       else if(!isSpinJumping)
       {
         velX = 0;
-      }
-
-      if(Input.check(Key.RIGHT) || Input.check(Key.LEFT) || !Input.check(Key.DOWN) || !onGround)
-      {
-        lostInThought = false;
-        if(motherTimer > 0)
-        {
-          motherTimer -= 1;
-        }
-        if(velX != 0 || velY != 0)
-        {
-          motherTimer = Math.max(0, motherTimer - 10);
-        }
-      }
-      else
-      {
-        lostInThought = true;
-        isSpinJumping = false;
-        spinJumpSfx.stop();
-        walkSfx.stop();
-        velX = 0;
-        if(motherTimer < MOTHER_VISITATION_TIME)
-        {
-          motherTimer += 1;
-        }
       }
 
       // JUMPING
