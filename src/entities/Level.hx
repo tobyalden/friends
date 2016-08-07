@@ -12,22 +12,19 @@ class Level extends Entity
 {
 
     public static inline var TILE_SIZE = 16;
-    public static inline var LEVEL_WIDTH = 80;
-    public static inline var LEVEL_HEIGHT = 60;
+    public static inline var LEVEL_WIDTH = 40;
+    public static inline var LEVEL_HEIGHT = 30;
 
     private var map:Array<Array<Int>>;
     private var tiles:Tilemap;
 
-    private var debugPoint1:Point;
-    private var debugPoint2:Point;
-
     public function new()
     {
-        debugPoint1 = new Point(0, 0);
-        debugPoint2 = new Point(0, 0);
         super(0, 0);
         map = [for (y in 0...LEVEL_HEIGHT) [for (x in 0...LEVEL_WIDTH) 0]];
+        randomizeMap();
         tiles = new Tilemap("graphics/tiles.png", LEVEL_WIDTH*TILE_SIZE, LEVEL_HEIGHT*TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        tiles.scale = 8;
         generateMap();
         tiles.loadFrom2DArray(map);
         graphic = tiles;
@@ -67,12 +64,11 @@ class Level extends Entity
       {
         System.exit(0);
       }
-
       tiles.loadFrom2DArray(map);
       super.update();
     }
 
-    private function generateMap()
+    public function generateMap()
     {
       randomizeMap();
       cellularAutomata();
@@ -91,28 +87,27 @@ class Level extends Entity
 
     private function connectAndContainAllRooms()
     {
-      while (countRooms() > 1) {
-        connectRooms(getRooms());
-        createBoundaries();
-      }
+      createBoundaries();
+      var rooms:Array<Array<Int>> = getRooms();
+      connectRooms(rooms);
     }
 
     private function randomizeMap()
     {
-      for (x in 0...Math.round(HXP.screen.width/TILE_SIZE))
+      for (x in 0...LEVEL_WIDTH)
       {
-        for (y in 0...Math.round(HXP.screen.height/TILE_SIZE))
+        for (y in 0...LEVEL_HEIGHT)
         {
-          map[y][x] = Math.round(Math.random() * 0.7 + Math.random() * -0.15 + Math.random() * 0.5);
+          map[y][x] = Math.round(Math.random() * 0.7);
         }
       }
     }
 
     private function invertMap()
     {
-      for (x in 0...Math.round(HXP.screen.width/TILE_SIZE))
+      for (x in 0...LEVEL_WIDTH)
       {
-        for (y in 0...Math.round(HXP.screen.height/TILE_SIZE))
+        for (y in 0...LEVEL_HEIGHT)
         {
           if (map[y][x] == 1) {
             map[y][x] = 0;
@@ -125,11 +120,11 @@ class Level extends Entity
 
     private function cellularAutomata()
     {
-      for (x in 0...Math.round(HXP.screen.width/TILE_SIZE))
+      for (x in 0...LEVEL_WIDTH)
       {
-        for (y in 0...Math.round(HXP.screen.height/TILE_SIZE))
+        for (y in 0...LEVEL_HEIGHT)
         {
-          if (emptyNeighbors(x, y, 1) >= 7 + Math.round(Math.random())) {
+          if (emptyNeighbors(x, y, 1) >= 6 + Math.round(Math.random())) {
             map[y][x] = 1;
           } else {
             map[y][x] = 0;
@@ -159,16 +154,16 @@ class Level extends Entity
 
     private function isWithinMap(x:Int, y:Int)
     {
-      return x >= 0 && y >= 0 && x < HXP.screen.width/TILE_SIZE && y < HXP.screen.height/TILE_SIZE;
+      return x >= 0 && y >= 0 && x < LEVEL_WIDTH && y < LEVEL_HEIGHT;
     }
 
     private function countRooms()
     {
       var roomCount:Int = 0;
       var rooms:Array<Array<Int>> = [for (y in 0...LEVEL_HEIGHT) [for (x in 0...LEVEL_WIDTH) 0]];
-      for (x in 0...Math.round(HXP.screen.width/TILE_SIZE))
+      for (x in 0...LEVEL_WIDTH)
       {
-        for (y in 0...Math.round(HXP.screen.height/TILE_SIZE))
+        for (y in 0...LEVEL_HEIGHT)
         {
           if (map[y][x] == 0 && rooms[y][x] == 0) {
             roomCount += 1;
@@ -183,9 +178,9 @@ class Level extends Entity
     {
       var roomCount:Int = 0;
       var rooms:Array<Array<Int>> = [for (y in 0...LEVEL_HEIGHT) [for (x in 0...LEVEL_WIDTH) 0]];
-      for (x in 0...Math.round(HXP.screen.width/TILE_SIZE))
+      for (x in 0...LEVEL_WIDTH)
       {
-        for (y in 0...Math.round(HXP.screen.height/TILE_SIZE))
+        for (y in 0...LEVEL_HEIGHT)
         {
           if (map[y][x] == 0 && rooms[y][x] == 0) {
             roomCount += 1;
@@ -230,24 +225,59 @@ class Level extends Entity
 
     private function connectRooms(rooms:Array<Array<Int>>)
     {
-      // Pick two random points in different rooms
-      var p1:Point;
-      var p2:Point;
-      do
+      // I should make it so it just picks all the points in one go...!
+      var p1:Point = null;
+      var p2:Point = null;
+
+      for (x in 0...LEVEL_WIDTH)
       {
-        p1 = pickRandomPoint();
+        if(p1 != null)
+        {
+          break;
+        }
+        for (y in 0...LEVEL_HEIGHT)
+        {
+          if(rooms[y][x] != 0)
+          {
+            p1 = new Point(x, y);
+            break;
+          }
+        }
       }
-      while (rooms[Math.round(p1.y)][Math.round(p1.x)] == 0);
-      do
+
+      if(p1 == null)
       {
-        p2 = pickRandomPoint();
+          return;
       }
-      while (rooms[Math.round(p2.y)][Math.round(p2.x)] == 0 || rooms[Math.round(p2.y)][Math.round(p2.x)] == rooms[Math.round(p1.y)][Math.round(p1.x)]);
+
+      for (x in 0...LEVEL_WIDTH)
+      {
+        if(p2 != null)
+        {
+          break;
+        }
+        for (y in 0...LEVEL_HEIGHT)
+        {
+          if(rooms[y][x] != 0 && rooms[y][x] != rooms[Math.round(p1.y)][Math.round(p1.x)])
+          {
+            p2 = new Point(x, y);
+            break;
+          }
+        }
+      }
+
+      if(p2 == null)
+      {
+          return;
+      }
+
+      var p1Start:Point = p1.clone();
+      var p2Start:Point = p2.clone();
 
       // Get P2 and P2 as close as possible to each other as possible without leaving the rooms they're in
-      for (x in 0...Math.round(HXP.screen.width/TILE_SIZE))
+      for (x in 0...LEVEL_WIDTH)
       {
-        for (y in 0...Math.round(HXP.screen.height/TILE_SIZE))
+        for (y in 0...LEVEL_HEIGHT)
         {
           if (rooms[y][x] == rooms[Math.round(p1.y)][Math.round(p1.x)]) {
             if (Point.distance(p1, p2) > Point.distance(p2, new Point(x, y))) {
@@ -257,9 +287,9 @@ class Level extends Entity
         }
       }
 
-      for (x in 0...Math.round(HXP.screen.width/TILE_SIZE))
+      for (x in 0...LEVEL_WIDTH)
       {
-        for (y in 0...Math.round(HXP.screen.height/TILE_SIZE))
+        for (y in 0...LEVEL_HEIGHT)
         {
           if (rooms[y][x] == rooms[Math.round(p2.y)][Math.round(p2.x)]) {
             if (Point.distance(p1, p2) > Point.distance(p1, new Point(x, y))) {
@@ -277,6 +307,19 @@ class Level extends Entity
         map[Math.round(pDig.y)][Math.round(pDig.x)] = 0;
         pDig = movePointTowardsPoint(pDig, p2);
       }
+
+      for (x in 0...LEVEL_WIDTH)
+      {
+        for (y in 0...LEVEL_HEIGHT)
+        {
+          if(rooms[y][x] == rooms[Math.round(p2Start.y)][Math.round(p2Start.x)])
+          {
+            rooms[y][x] = rooms[Math.round(p1Start.y)][Math.round(p1Start.x)];
+          }
+        }
+      }
+
+      connectRooms(rooms);
     }
 
     public function movePointTowardsPoint(movePoint:Point, towardsPoint:Point)
@@ -301,11 +344,11 @@ class Level extends Entity
 
     public function createBoundaries()
     {
-      for (x in 0...Math.round(HXP.screen.width/TILE_SIZE))
+      for (x in 0...LEVEL_WIDTH)
       {
-        for (y in 0...Math.round(HXP.screen.height/TILE_SIZE))
+        for (y in 0...LEVEL_HEIGHT)
         {
-          if (x == 0 || y == 0 || x == (HXP.screen.width/TILE_SIZE)-1 || y == (HXP.screen.height/TILE_SIZE)-1) {
+          if (x == 0 || y == 0 || x == (LEVEL_WIDTH)-1 || y == (LEVEL_HEIGHT)-1) {
             map[y][x] = 1;
           }
         }
