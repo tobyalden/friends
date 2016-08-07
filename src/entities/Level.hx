@@ -45,7 +45,7 @@ class Level extends Entity
         type = "walls";
 
         var playerStart:Point = pickRandomOpenPoint();
-        HXP.scene.add(new PlayerOne(Math.round(playerStart.x * LEVEL_SCALE * TILE_SIZE), Math.round(playerStart.y * LEVEL_SCALE * TILE_SIZE)));
+        HXP.scene.add(new Player(Math.round(playerStart.x * LEVEL_SCALE * TILE_SIZE), Math.round(playerStart.y * LEVEL_SCALE * TILE_SIZE)));
         layer = 20;
     }
 
