@@ -12,16 +12,18 @@ import entities.Level;
 
 class Player extends ActiveEntity
 {
-    public static inline var GRAVITY = 0.25;
-    public static inline var TERMINAL_VELOCITY = 6;
-    public static inline var RUN_SPEED = 3.5;
-    public static inline var JUMP_POWER = 6;
-    public static inline var WALL_JUMP_POWER = 6 / 1.414;
-    public static inline var STANDING_JUMP_SPEED_PERCENTAGE = 0.92;
+    public static inline var NIGHTCORE = 1.1;
 
-    public static inline var CLIMB_UP_SPEED = 3.5;
-    public static inline var SLIDE_DOWN_SPEED = 3.5;
-    public static inline var CEILING_CLIMB_SPEED = 3.5;
+    public static inline var GRAVITY = 0.3 * NIGHTCORE;
+    public static inline var TERMINAL_VELOCITY = 6 * NIGHTCORE;
+    public static inline var RUN_SPEED = 3.5 * NIGHTCORE;
+    public static inline var JUMP_POWER = 6 * NIGHTCORE;
+    public static inline var WALL_JUMP_POWER = 6 / 1.414 * NIGHTCORE;
+    public static inline var STANDING_JUMP_SPEED_PERCENTAGE = 0.92 * NIGHTCORE;
+
+    public static inline var CLIMB_UP_SPEED = 3.5 * NIGHTCORE;
+    public static inline var SLIDE_DOWN_SPEED = 4 * NIGHTCORE;
+    public static inline var CEILING_CLIMB_SPEED = 3.5 * NIGHTCORE;
 
 
     public static inline var GAME_START_X = 0;
@@ -72,6 +74,8 @@ class Player extends ActiveEntity
         sprite.add("hit", [2]);
         sprite.add("hang", [10]);
         sprite.add("climb", [10, 11], 8);
+        sprite.add("ceiling-hang", [12]);
+        sprite.add("ceiling-climb", [12, 13], 8);
         sprite.play("idle");
         graphic = sprite;
         layer = -2550;
@@ -246,11 +250,25 @@ class Player extends ActiveEntity
         }
         else if(Input.check(Key.LEFT))
         {
-          velX = -CEILING_CLIMB_SPEED;
+          if(collide("walls", x - CEILING_CLIMB_SPEED, y - 1) != null)
+          {
+            velX = -CEILING_CLIMB_SPEED;
+          }
+          else
+          {
+            velX = 0;
+          }
         }
         else if(Input.check(Key.RIGHT))
         {
-          velX = CEILING_CLIMB_SPEED;
+          if(collide("walls", x + CEILING_CLIMB_SPEED, y - 1) != null)
+          {
+            velX = CEILING_CLIMB_SPEED;
+          }
+          else
+          {
+            velX = 0;
+          }
         }
         else
         {
@@ -301,6 +319,7 @@ class Player extends ActiveEntity
       else if(!onGround)
       {
         walkSfx.stop();
+
         if(isOnWall())
         {
           if(velY < 0)
@@ -310,6 +329,17 @@ class Player extends ActiveEntity
           else
           {
             sprite.play('hang');
+          }
+        }
+        else if(isOnCeiling())
+        {
+          if(velX != 0)
+          {
+            sprite.play('ceiling-climb');
+          }
+          else
+          {
+            sprite.play('ceiling-hang');
           }
         }
         else if(isSpinJumping)
