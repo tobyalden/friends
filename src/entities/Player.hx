@@ -16,7 +16,13 @@ class Player extends ActiveEntity
     public static inline var TERMINAL_VELOCITY = 6;
     public static inline var RUN_SPEED = 3.5;
     public static inline var JUMP_POWER = 6;
+    public static inline var WALL_JUMP_POWER = 6 / 1.414;
     public static inline var STANDING_JUMP_SPEED_PERCENTAGE = 0.92;
+
+    public static inline var CLIMB_UP_SPEED = 3.5;
+    public static inline var SLIDE_DOWN_SPEED = 3.5;
+    public static inline var CEILING_CLIMB_SPEED = 3.5;
+
 
     public static inline var GAME_START_X = 0;
     public static inline var GAME_START_Y = 0;
@@ -37,6 +43,8 @@ class Player extends ActiveEntity
     private var spinJumpSfx:Sfx;
     private var landSfx:Sfx;
 
+    private var canDoubleJump:Bool;
+
     private var invincibleTimer:Int;
     private var stunned:Bool;
 
@@ -53,6 +61,7 @@ class Player extends ActiveEntity
         health = 1;
         onGround = false;
         isSpinJumping = false;
+        canDoubleJump = false;
         invincibleTimer = 0;
         stunned = false;
         sprite = new Spritemap("graphics/player.png", 32, 48);
@@ -62,7 +71,7 @@ class Player extends ActiveEntity
         sprite.add("spinjump", [2, 3, 4, 5], 12);
         sprite.add("hit", [2]);
         sprite.add("hang", [10]);
-        sprite.add("climb", [10, 11], 12);
+        sprite.add("climb", [10, 11], 8);
         sprite.play("idle");
         graphic = sprite;
         layer = -2550;
@@ -178,8 +187,18 @@ class Player extends ActiveEntity
 
       // JUMPING
 
+      if(!onGround && canDoubleJump)
+      {
+        if(Input.pressed(Key.Z))
+        {
+          velY = -JUMP_POWER;
+          jumpSfx.play();
+          canDoubleJump = false;
+        }
+      }
       if(onGround)
       {
+        canDoubleJump = true;
         velY = 0;
         isSpinJumping = false;
         if(Input.pressed(Key.Z))
@@ -194,11 +213,52 @@ class Player extends ActiveEntity
       }
       else if(isOnWall())
       {
-        velY = 0;
+        canDoubleJump = true;
+        isSpinJumping = false;
+        if(Input.pressed(Key.Z))
+        {
+          var direction:Int = (isOnRightWall())? -1: 1;
+          velX = WALL_JUMP_POWER * direction;
+          velY = -WALL_JUMP_POWER;
+          isSpinJumping = true;
+          sprite.flipped = !sprite.flipped;
+        }
+        else if(Input.check(Key.UP))
+        {
+          velY = -CLIMB_UP_SPEED;
+        }
+        else if(Input.check(Key.DOWN))
+        {
+          velY = SLIDE_DOWN_SPEED;
+        }
+        else
+        {
+          velY = 0;
+        }
+      }
+      else if(isOnCeiling() && Input.check(Key.Z))
+      {
+        canDoubleJump = true;
+        isSpinJumping = false;
+        if(!Input.check(Key.Z))
+        {
+          y += 1;
+        }
+        else if(Input.check(Key.LEFT))
+        {
+          velX = -CEILING_CLIMB_SPEED;
+        }
+        else if(Input.check(Key.RIGHT))
+        {
+          velX = CEILING_CLIMB_SPEED;
+        }
+        else
+        {
+          velX = 0;
+        }
       }
       else
       {
-
         if(!isSpinJumping)
         {
           velX *= STANDING_JUMP_SPEED_PERCENTAGE;
@@ -238,14 +298,21 @@ class Player extends ActiveEntity
       {
         sprite.play('lost_in_thought');
       }
-      else if(isOnWall())
-      {
-        sprite.play('hang');
-      }
       else if(!onGround)
       {
         walkSfx.stop();
-        if(isSpinJumping)
+        if(isOnWall())
+        {
+          if(velY < 0)
+          {
+            sprite.play('climb');
+          }
+          else
+          {
+            sprite.play('hang');
+          }
+        }
+        else if(isSpinJumping)
         {
           sprite.play('spinjump');
           if(!spinJumpSfx.playing)
