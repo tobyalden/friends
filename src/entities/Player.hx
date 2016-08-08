@@ -39,7 +39,6 @@ class Player extends ActiveEntity
 
     private var invincibleTimer:Int;
     private var stunned:Bool;
-    private var isHoldingJump:Bool;
 
     private var lostInThought:Bool;
 
@@ -56,13 +55,14 @@ class Player extends ActiveEntity
         isSpinJumping = false;
         invincibleTimer = 0;
         stunned = false;
-        isHoldingJump = false;
         sprite = new Spritemap("graphics/player.png", 32, 48);
         sprite.add("idle", [0]);
         sprite.add("walk", [6, 7, 8], 12);
         sprite.add("jump", [9]);
         sprite.add("spinjump", [2, 3, 4, 5], 12);
         sprite.add("hit", [2]);
+        sprite.add("hang", [10]);
+        sprite.add("climb", [10, 11], 12);
         sprite.play("idle");
         graphic = sprite;
         layer = -2550;
@@ -102,7 +102,7 @@ class Player extends ActiveEntity
         }
         else
         {
-            velY += GRAVITY;
+          velY += GRAVITY;
         }
 
         moveBy(velX, velY, "walls");
@@ -178,17 +178,12 @@ class Player extends ActiveEntity
 
       // JUMPING
 
-      if(Input.released(Key.Z))
-      {
-        isHoldingJump = false;
-      }
       if(onGround)
       {
         velY = 0;
         isSpinJumping = false;
         if(Input.pressed(Key.Z))
         {
-          isHoldingJump = true;
           velY = -JUMP_POWER;
           jumpSfx.play();
           if((Input.check(Key.RIGHT) || Input.check(Key.LEFT)))
@@ -196,6 +191,10 @@ class Player extends ActiveEntity
             isSpinJumping = true;
           }
         }
+      }
+      else if(isOnWall())
+      {
+        velY = 0;
       }
       else
       {
@@ -238,6 +237,10 @@ class Player extends ActiveEntity
       else if(lostInThought)
       {
         sprite.play('lost_in_thought');
+      }
+      else if(isOnWall())
+      {
+        sprite.play('hang');
       }
       else if(!onGround)
       {
