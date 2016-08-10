@@ -17,7 +17,8 @@ class Player extends ActiveEntity
     public static inline var GRAVITY = 0.3 * NIGHTCORE;
     public static inline var TERMINAL_VELOCITY = 6 * NIGHTCORE;
     public static inline var RUN_SPEED = 3.5 * NIGHTCORE;
-    public static inline var JUMP_POWER = 6 * NIGHTCORE;
+    public static inline var JUMP_POWER = 6.3 * NIGHTCORE;
+    public static inline var JUMP_CANCEL_POWER = JUMP_POWER/2;
     public static inline var WALL_JUMP_POWER = 6 / 1.414 * NIGHTCORE;
     public static inline var STANDING_JUMP_SPEED_PERCENTAGE = 0.92 * NIGHTCORE;
 
@@ -48,9 +49,10 @@ class Player extends ActiveEntity
     private var canDoubleJump:Bool;
 
     private var invincibleTimer:Int;
-    private var stunned:Bool;
 
+    private var stunned:Bool;
     private var lostInThought:Bool;
+    private var isDead:Bool;
 
     public function new(x:Int, y:Int)
     {
@@ -60,8 +62,9 @@ class Player extends ActiveEntity
         setHitbox(12, 32, -10, -16);
         velX = 0;
         velY = 0;
-        health = 1;
+        health = 3;
         onGround = false;
+        isDead = false;
         isSpinJumping = false;
         canDoubleJump = false;
         invincibleTimer = 0;
@@ -277,6 +280,13 @@ class Player extends ActiveEntity
       }
       else
       {
+        if(Input.released(Key.Z) && !isSpinJumping)
+        {
+          if(velY < -JUMP_CANCEL_POWER)
+          {
+            velY = -JUMP_CANCEL_POWER;
+          }
+        }
         if(!isSpinJumping)
         {
           velX *= STANDING_JUMP_SPEED_PERCENTAGE;
@@ -287,12 +297,12 @@ class Player extends ActiveEntity
       }
     }
 
-    private function hit(damage:Int, enemy:Entity, hitFactor:Int)
+    private function hit(damageAmount:Int, enemy:Entity, hitFactor:Int)
     {
       if(invincibleTimer == 0)
       {
         invincibleTimer = INVINCIBLITY_DURATION;
-        health -= damage;
+        damage(damageAmount);
         stunned = true;
         if(x < enemy.x)
         {
@@ -303,6 +313,18 @@ class Player extends ActiveEntity
           velX = HIT_VEL_X*hitFactor;
         }
         velY = -HIT_VEL_Y*hitFactor;
+      }
+    }
+
+    override public function damage(damage:Int)
+    {
+      if(!invincible)
+      {
+        health -= damage;
+        if(health <= 0)
+        {
+          isDead = true;
+        }
       }
     }
 

@@ -1,6 +1,7 @@
 package scenes;
 
-import com.haxepunk.Scene;
+import com.haxepunk.*;
+import com.haxepunk.graphics.*;
 import entities.*;
 
 class GameScene extends Scene
@@ -13,7 +14,9 @@ class GameScene extends Scene
 
     public override function begin()
     {
-        add(new Level());
+        add(new Entity(0, 0, new Backdrop("graphics/background.png")));
+        add(new Level(Level.WORLD_WIDTH, Level.WORLD_HEIGHT, true));
+        add(new HUD(0, 0));
     }
 
 }

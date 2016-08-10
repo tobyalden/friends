@@ -21,6 +21,12 @@ class ActiveEntity extends Entity
     invincible = false;
   }
 
+  public override function update()
+  {
+      super.update();
+      unstuck();
+  }
+
   public function damage(damage:Int)
   {
     if(!invincible)
