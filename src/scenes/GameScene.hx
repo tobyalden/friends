@@ -15,9 +15,10 @@ class GameScene extends Scene
     public override function begin()
     {
         add(new Entity(0, 0, new Backdrop("graphics/background.png")));
+        add(new Visuals(true));
+        add(new Visuals(false));
         add(new Level(Level.WORLD_WIDTH, Level.WORLD_HEIGHT, true));
         add(new HUD(0, 0));
-        add(new Visuals());
     }
 
 }
