@@ -17,6 +17,7 @@ class GameScene extends Scene
         add(new Entity(0, 0, new Backdrop("graphics/background.png")));
         add(new Level(Level.WORLD_WIDTH, Level.WORLD_HEIGHT, true));
         add(new HUD(0, 0));
+        add(new Visuals());
     }
 
 }
