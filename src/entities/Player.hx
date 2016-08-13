@@ -9,6 +9,7 @@ import com.haxepunk.utils.Input;
 import com.haxepunk.utils.Key;
 import com.haxepunk.Sfx;
 import entities.Level;
+import scenes.GameScene;
 
 class Player extends ActiveEntity
 {
@@ -169,6 +170,12 @@ class Player extends ActiveEntity
             trace(x + ' ' + y);
           }
           unstuck();
+        }
+
+        var exit = collide('exit', x, y);
+        if(exit != null)
+        {
+          cast(HXP.scene, GameScene).nextLevel(cast(exit, Exit).exitDirection);
         }
 
         super.update();

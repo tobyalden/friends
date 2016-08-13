@@ -24,19 +24,23 @@ class Level extends Entity
     public static inline var TEMPLE_HEIGHT = 30;
 
     public static inline var LEVEL_SCALE = 8;
+    public static inline var TOTAL_SCALE = TILE_SIZE * LEVEL_SCALE;
 
     private var map:Array<Array<Int>>;
     private var tiles:Tilemap;
     private var collisionMask:Grid;
 
-    private var levelWidth:Int;
-    private var levelHeight:Int;
+    public var levelWidth:Int;
+    public var levelHeight:Int;
+
+    public var levelEntities:Array<Entity>;
 
     public function new(levelWidth:Int, levelHeight:Int, isWorld:Bool = false)
     {
         super(0, 0);
         this.levelWidth = levelWidth;
         this.levelHeight = levelHeight;
+        levelEntities = new Array<Entity>();
         map = [for (y in 0...levelHeight) [for (x in 0...levelWidth) 0]];
         tiles = new Tilemap("graphics/tiles.png", levelWidth*TILE_SIZE, levelHeight*TILE_SIZE, TILE_SIZE, TILE_SIZE);
         if(isWorld)
@@ -104,14 +108,18 @@ class Level extends Entity
     {
       randomizeMap();
       generateRedTemple();
-      placeSpikes();
-      placeEnemies();
+      /*placeSpikes();
+      placeEnemies();*/
       prettifyMap();
       createBoundaries();
       openSides();
       /*coverFloorWithSpikes();*/
+    }
+
+    public function getPlayer()
+    {
       var playerStart:Point = pickRandomOpenPoint();
-      HXP.scene.add(new Player(Math.round(playerStart.x * LEVEL_SCALE * TILE_SIZE), Math.round(playerStart.y * LEVEL_SCALE * TILE_SIZE)));
+      return new Player(Math.round(playerStart.x * LEVEL_SCALE * TILE_SIZE), Math.round(playerStart.y * LEVEL_SCALE * TILE_SIZE));
     }
 
     public function prettifyMap()
@@ -134,12 +142,12 @@ class Level extends Entity
       for(i in 0...30)
       {
         var openPoint:Point = pickRandomOpenPoint();
-        HXP.scene.add(new Hopper(openPoint.x * TILE_SIZE * LEVEL_SCALE, openPoint.y * TILE_SIZE * LEVEL_SCALE));
+        levelEntities.push(new Hopper(openPoint.x * TILE_SIZE * LEVEL_SCALE, openPoint.y * TILE_SIZE * LEVEL_SCALE));
       }
       for(i in 0...10)
       {
         var openPoint:Point = pickRandomOpenPoint();
-        HXP.scene.add(new Brute(openPoint.x * TILE_SIZE * LEVEL_SCALE, openPoint.y * TILE_SIZE * LEVEL_SCALE));
+        levelEntities.push(new Brute(openPoint.x * TILE_SIZE * LEVEL_SCALE, openPoint.y * TILE_SIZE * LEVEL_SCALE));
       }
     }
 
@@ -211,7 +219,7 @@ class Level extends Entity
 
       for(spike in spikes)
       {
-        HXP.scene.add(spike);
+        levelEntities.push(spike);
       }
 
     }
@@ -224,7 +232,7 @@ class Level extends Entity
         {
           if(map[y][x] == 1 && isWithinMap(x, y - 1) && map[y - 1][x] == 0)
           {
-            HXP.scene.add(new Spike(x * TILE_SIZE * LEVEL_SCALE, (y - 1) * TILE_SIZE * LEVEL_SCALE, "floor"));
+            levelEntities.push(new Spike(x * TILE_SIZE * LEVEL_SCALE, (y - 1) * TILE_SIZE * LEVEL_SCALE, "floor"));
           }
         }
       }
@@ -355,6 +363,20 @@ class Level extends Entity
           }
         }
       }
+      placeExits();
+    }
+
+    private function placeExits()
+    {
+      // ((x == 0 || x == levelWidth-1) && y == levelHeight/2
+      var leftExit:Exit = new Exit(-TOTAL_SCALE, levelHeight/2 * TOTAL_SCALE, "left");
+      var rightExit:Exit = new Exit((levelWidth-1) * TOTAL_SCALE + TOTAL_SCALE, levelHeight/2 * TOTAL_SCALE, "right");
+      var topExit:Exit = new Exit(levelWidth/2 * TOTAL_SCALE, -TOTAL_SCALE, "top");
+      var bottomExit:Exit = new Exit(levelWidth/2 * TOTAL_SCALE, (levelHeight-1) * TOTAL_SCALE + TOTAL_SCALE, "bottom");
+      levelEntities.push(leftExit);
+      levelEntities.push(rightExit);
+      levelEntities.push(topExit);
+      levelEntities.push(bottomExit);
     }
 
     public function getRooms()
