@@ -20,7 +20,7 @@ class GameScene extends Scene
         add(new Entity(0, 0, new Backdrop("graphics/background.png")));
         add(new Visuals(true));
         add(new Visuals(false));
-        currentLevel = new Level(Level.WORLD_WIDTH, Level.WORLD_HEIGHT, true);
+        currentLevel = new Level(Level.WORLD_WIDTH, Level.WORLD_HEIGHT, "start");
         add(currentLevel);
         for(entity in currentLevel.levelEntities)
         {
@@ -34,7 +34,7 @@ class GameScene extends Scene
     public function nextLevel(exitDirection:String)
     {
       removeAll();
-      currentLevel = new Level(Level.WORLD_WIDTH, Level.WORLD_HEIGHT, true);
+      currentLevel = new Level(Level.WORLD_WIDTH, Level.WORLD_HEIGHT, "default");
       add(currentLevel);
       for(entity in currentLevel.levelEntities)
       {

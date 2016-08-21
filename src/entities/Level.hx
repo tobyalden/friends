@@ -35,7 +35,7 @@ class Level extends Entity
 
     public var levelEntities:Array<Entity>;
 
-    public function new(levelWidth:Int, levelHeight:Int, isWorld:Bool = false)
+    public function new(levelWidth:Int, levelHeight:Int, levelType:String)
     {
         super(0, 0);
         this.levelWidth = levelWidth;
@@ -43,11 +43,8 @@ class Level extends Entity
         levelEntities = new Array<Entity>();
         map = [for (y in 0...levelHeight) [for (x in 0...levelWidth) 0]];
         tiles = new Tilemap("graphics/tiles.png", levelWidth*TILE_SIZE, levelHeight*TILE_SIZE, TILE_SIZE, TILE_SIZE);
-        if(isWorld)
-        {
-          generateWorld();
-          finishInitializing();
-        }
+        generateLevel(levelType);
+        finishInitializing();
         layer = -1000;
     }
 
@@ -104,16 +101,25 @@ class Level extends Entity
       super.update();
     }*/
 
-    public function generateWorld()
+    public function generateLevel(levelType:String)
     {
-      randomizeMap();
-      generateRedTemple();
-      /*placeSpikes();
-      placeEnemies();*/
-      prettifyMap();
-      createBoundaries();
-      openSides();
-      /*coverFloorWithSpikes();*/
+      if(levelType == "start")
+      {
+        createBoundaries();
+        openSides();
+      }
+      else if(levelType == "default")
+      {
+        randomizeMap();
+        cellularAutomata();
+        connectAndContainAllRooms();
+        placeSpikes();
+        placeEnemies();
+        prettifyMap();
+        createBoundaries();
+        openSides();
+      }
+            /*coverFloorWithSpikes();*/
     }
 
     public function getPlayer()
@@ -148,23 +154,6 @@ class Level extends Entity
       {
         var openPoint:Point = pickRandomOpenPoint();
         levelEntities.push(new Brute(openPoint.x * TILE_SIZE * LEVEL_SCALE, openPoint.y * TILE_SIZE * LEVEL_SCALE));
-      }
-    }
-
-    public function generateRedTemple()
-    {
-      var redTemple = new Level(TEMPLE_WIDTH, TEMPLE_HEIGHT);
-      redTemple.randomizeMap();
-      redTemple.cellularAutomata();
-      redTemple.connectAndContainAllRooms();
-      var offset = 0;
-      /*var offset = Math.round(Math.random() * 2);*/
-      for (x in 0...TEMPLE_WIDTH)
-      {
-        for (y in 0...TEMPLE_HEIGHT)
-        {
-          map[y+ offset*TEMPLE_HEIGHT][x + offset*TEMPLE_WIDTH] = redTemple.getMap()[y][x];
-        }
       }
     }
 
