@@ -26,6 +26,9 @@ class Level extends Entity
     public static inline var LEVEL_SCALE = 8;
     public static inline var TOTAL_SCALE = TILE_SIZE * LEVEL_SCALE;
 
+    /*public static inline var DECAY_CHANCE = 0.05;*/
+    public static inline var DECAY_CHANCE = 1;
+
     private var map:Array<Array<Int>>;
     private var tiles:Tilemap;
     private var collisionMask:Grid;
@@ -68,9 +71,9 @@ class Level extends Entity
       layer = 20;
     }
 
-    /*public override function update()
+    public override function update()
     {
-      if (Input.pressed(Key.R))
+      /*if (Input.pressed(Key.R))
       {
         randomizeMap();
       }
@@ -99,9 +102,14 @@ class Level extends Entity
         System.exit(0);
       }
       tiles.loadFrom2DArray(map);
-      collisionMask.loadFrom2DArray(map);
+      collisionMask.loadFrom2DArray(map);*/
+      if(Math.random() < DECAY_CHANCE)
+      {
+        /*randomizeTiles();*/
+        switchTiles();
+      }
       super.update();
-    }*/
+    }
 
     public function generateLevel(levelType:String)
     {
@@ -137,6 +145,8 @@ class Level extends Entity
         connectAndContainAllRooms();
         placeSpikes();
         tiles = new Tilemap("graphics/spa-tiles.png", levelWidth*TILE_SIZE, levelHeight*TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        createBoundaries();
+        openSides();
         prettifyMap();
       }
             /*coverFloorWithSpikes();*/
@@ -189,6 +199,37 @@ class Level extends Entity
         }
       }
       tiles.loadFrom2DArray(map);
+    }
+
+    public function randomizeTiles()
+    {
+      for (x in 0...levelWidth)
+      {
+        for (y in 0...levelHeight)
+        {
+          if(map[y][x] != 0)
+          {
+            var tile:Int = Math.floor(Math.random() * tiles.tileCount);
+            if(tile == 0)
+            {
+              /*Math.floor(Math.random() * tiles.tileCount);*/
+              tile = 1;
+            }
+            map[y][x] = tile;
+          }
+        }
+      }
+      tiles.loadFrom2DArray(map);
+    }
+
+    public function switchTiles()
+    {
+      var point1:Point = pickRandomPoint();
+      var point2:Point = pickRandomPoint();
+      map[Math.round(point1.y)][Math.round(point1.x)] = map[Math.round(point2.y)][Math.round(point2.x)];
+      map[Math.round(point2.y)][Math.round(point2.x)] = map[Math.round(point1.y)][Math.round(point1.x)];
+      tiles.loadFrom2DArray(map);
+      collisionMask.loadFrom2DArray(map);
     }
 
     public function placeEnemies()
