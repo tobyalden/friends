@@ -110,9 +110,9 @@ class Level extends Entity
         createBoundaries();
         randomizeMap();
         cellularAutomata();
-        connectAndContainAllRooms();
         mirrorHorizontally();
         mirrorVertically();
+        connectAndContainAllRooms();
         createBoundaries();
         openSides();
         tiles = new Tilemap("graphics/start-tiles.png", levelWidth*TILE_SIZE, levelHeight*TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -128,6 +128,15 @@ class Level extends Entity
         createBoundaries();
         openSides();
         tiles = new Tilemap("graphics/default-tiles.png", levelWidth*TILE_SIZE, levelHeight*TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        prettifyMap();
+      }
+      else if(levelType == "spa")
+      {
+        randomizeMap();
+        mirrorHorizontally();
+        connectAndContainAllRooms();
+        placeSpikes();
+        tiles = new Tilemap("graphics/spa-tiles.png", levelWidth*TILE_SIZE, levelHeight*TILE_SIZE, TILE_SIZE, TILE_SIZE);
         prettifyMap();
       }
             /*coverFloorWithSpikes();*/
@@ -162,15 +171,20 @@ class Level extends Entity
 
     public function prettifyMap()
     {
+      var count:Int = 0;
       for (x in 0...levelWidth)
       {
         for (y in 0...levelHeight)
         {
           if(map[y][x] != 0)
           {
-            trace(tiles.tileCount);
-            trace(Math.floor(Math.random() * tiles.tileCount));
-            map[y][x] = Math.floor(Math.random() * tiles.tileCount);
+            /*map[y][x] = Math.floor(Math.random() * tiles.tileCount);*/
+            map[y][x] = count;
+            count++;
+            if(count > tiles.tileCount)
+            {
+              count = 0;
+            }
           }
         }
       }

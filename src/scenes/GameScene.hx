@@ -17,7 +17,7 @@ class GameScene extends Scene
 
     public override function begin()
     {
-        currentLevel = new Level(Level.WORLD_WIDTH, Level.WORLD_HEIGHT, "start");
+        currentLevel = new Level(Level.WORLD_WIDTH, Level.WORLD_HEIGHT, "spa");
         add(new Entity(0, 0, new Backdrop("graphics/" + currentLevel.levelType + "-background.png")));
         add(new Visuals(true));
         add(new Visuals(false));
