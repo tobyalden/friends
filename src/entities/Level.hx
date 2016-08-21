@@ -106,6 +106,13 @@ class Level extends Entity
       if(levelType == "start")
       {
         createBoundaries();
+        randomizeMap();
+        cellularAutomata();
+        connectAndContainAllRooms();
+        mirrorHorizontally();
+        mirrorVertically();
+        /*prettifyMap();*/
+        createBoundaries();
         openSides();
       }
       else if(levelType == "default")
@@ -124,8 +131,29 @@ class Level extends Entity
 
     public function getPlayer()
     {
-      var playerStart:Point = pickRandomOpenPoint();
-      return new Player(Math.round(playerStart.x * LEVEL_SCALE * TILE_SIZE), Math.round(playerStart.y * LEVEL_SCALE * TILE_SIZE));
+      return new Player(Math.round(levelWidth/2 * TOTAL_SCALE - 12), Math.round(levelHeight/2 * TOTAL_SCALE));
+    }
+
+    public function mirrorHorizontally()
+    {
+      for (x in 0...Math.round(levelWidth/2))
+      {
+        for (y in 0...levelHeight)
+        {
+          map[y][(levelWidth-1) - x] = map[y][x];
+        }
+      }
+    }
+
+    public function mirrorVertically()
+    {
+      for (x in 0...levelWidth)
+      {
+        for (y in 0...Math.floor(levelHeight/2))
+        {
+          map[(levelHeight-1) - y][x] = map[y][x];
+        }
+      }
     }
 
     public function prettifyMap()
