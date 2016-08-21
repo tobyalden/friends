@@ -33,6 +33,8 @@ class Level extends Entity
     public var levelWidth:Int;
     public var levelHeight:Int;
 
+    public var levelType:String;
+
     public var levelEntities:Array<Entity>;
 
     public function new(levelWidth:Int, levelHeight:Int, levelType:String)
@@ -40,9 +42,9 @@ class Level extends Entity
         super(0, 0);
         this.levelWidth = levelWidth;
         this.levelHeight = levelHeight;
+        this.levelType = levelType;
         levelEntities = new Array<Entity>();
         map = [for (y in 0...levelHeight) [for (x in 0...levelWidth) 0]];
-        tiles = new Tilemap("graphics/tiles.png", levelWidth*TILE_SIZE, levelHeight*TILE_SIZE, TILE_SIZE, TILE_SIZE);
         generateLevel(levelType);
         finishInitializing();
         layer = -1000;
@@ -111,9 +113,10 @@ class Level extends Entity
         connectAndContainAllRooms();
         mirrorHorizontally();
         mirrorVertically();
-        /*prettifyMap();*/
         createBoundaries();
         openSides();
+        tiles = new Tilemap("graphics/start-tiles.png", levelWidth*TILE_SIZE, levelHeight*TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        prettifyMap();
       }
       else if(levelType == "default")
       {
@@ -122,9 +125,10 @@ class Level extends Entity
         connectAndContainAllRooms();
         placeSpikes();
         placeEnemies();
-        prettifyMap();
         createBoundaries();
         openSides();
+        tiles = new Tilemap("graphics/default-tiles.png", levelWidth*TILE_SIZE, levelHeight*TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        prettifyMap();
       }
             /*coverFloorWithSpikes();*/
     }
@@ -164,6 +168,8 @@ class Level extends Entity
         {
           if(map[y][x] != 0)
           {
+            trace(tiles.tileCount);
+            trace(Math.floor(Math.random() * tiles.tileCount));
             map[y][x] = Math.floor(Math.random() * tiles.tileCount);
           }
         }

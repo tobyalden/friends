@@ -17,10 +17,10 @@ class GameScene extends Scene
 
     public override function begin()
     {
-        add(new Entity(0, 0, new Backdrop("graphics/background.png")));
+        currentLevel = new Level(Level.WORLD_WIDTH, Level.WORLD_HEIGHT, "start");
+        add(new Entity(0, 0, new Backdrop("graphics/" + currentLevel.levelType + "-background.png")));
         add(new Visuals(true));
         add(new Visuals(false));
-        currentLevel = new Level(Level.WORLD_WIDTH, Level.WORLD_HEIGHT, "start");
         add(currentLevel);
         for(entity in currentLevel.levelEntities)
         {
@@ -35,6 +35,9 @@ class GameScene extends Scene
     {
       removeAll();
       currentLevel = new Level(Level.WORLD_WIDTH, Level.WORLD_HEIGHT, "default");
+      add(new Entity(0, 0, new Backdrop("graphics/" + currentLevel.levelType + "-background.png")));
+      add(new Visuals(true));
+      add(new Visuals(false));
       add(currentLevel);
       for(entity in currentLevel.levelEntities)
       {
