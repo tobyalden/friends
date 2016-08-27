@@ -2,6 +2,7 @@ package entities;
 
 import flash.system.System;
 import flash.geom.Point;
+import com.haxepunk.Sfx;
 import com.haxepunk.Entity;
 import com.haxepunk.graphics.*;
 import com.haxepunk.HXP;
@@ -38,6 +39,9 @@ class Level extends Entity
 
     public var levelType:String;
 
+    public var levelMusic:Sfx;
+    public var deathMusic:Sfx;
+
     public var levelEntities:Array<Entity>;
 
     public function new(levelWidth:Int, levelHeight:Int, levelType:String)
@@ -46,6 +50,10 @@ class Level extends Entity
         this.levelWidth = levelWidth;
         this.levelHeight = levelHeight;
         this.levelType = levelType;
+        levelMusic = new Sfx('audio/' + levelType + '-music.wav');
+        deathMusic = new Sfx('audio/death-music.wav');
+        levelMusic.volume = 0.2;
+        levelMusic.play();
         levelEntities = new Array<Entity>();
         map = [for (y in 0...levelHeight) [for (x in 0...levelWidth) 0]];
         generateLevel(levelType);
@@ -73,6 +81,15 @@ class Level extends Entity
 
     public override function update()
     {
+      var player:Entity = scene.getInstance('player');
+      if(cast(player, Player).isDead)
+      {
+        if(!deathMusic.playing)
+        {
+          deathMusic.loop();
+          levelMusic.stop();
+        }
+      }
       /*if (Input.pressed(Key.R))
       {
         randomizeMap();
@@ -150,7 +167,17 @@ class Level extends Entity
         openSides();
         prettifyMap();
       }
-            /*coverFloorWithSpikes();*/
+      else if(levelType == "tantrum")
+      {
+        randomizeMap();
+        connectAndContainAllRooms();
+        coverFloorWithSpikes();
+        placeEnemies();
+        tiles = new Tilemap("graphics/tantrum-tiles.png", levelWidth*TILE_SIZE, levelHeight*TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        createBoundaries();
+        openSides();
+        prettifyMap();
+      }
     }
 
     public function getPlayer()
@@ -255,6 +282,14 @@ class Level extends Entity
           var openPoint:Point = pickRandomOpenPoint();
           levelEntities.push(new PinkBrother(openPoint.x * TILE_SIZE * LEVEL_SCALE, openPoint.y * TILE_SIZE * LEVEL_SCALE));
         }
+      }
+      else if(levelType == "tantrum")
+      {
+        /*for(i in 0...10)
+        {
+          var openPoint:Point = pickRandomOpenPoint();
+          levelEntities.push(new LustDemon(openPoint.x * TILE_SIZE * LEVEL_SCALE, openPoint.y * TILE_SIZE * LEVEL_SCALE));
+        }*/
       }
     }
 

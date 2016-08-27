@@ -47,6 +47,9 @@ class Player extends ActiveEntity
     private var spinJumpSfx:Sfx;
     private var landSfx:Sfx;
     private var gameOverSfx:Sfx;
+    private var ceilingClimbSfx:Sfx;
+    private var wallClimbSfx:Sfx;
+    private var damageSfx:Sfx;
 
     private var canDoubleJump:Bool;
 
@@ -64,7 +67,7 @@ class Player extends ActiveEntity
         setHitbox(12, 32, -10, -16);
         velX = 0;
         velY = 0;
-        health = 20;
+        health = 100;
         onGround = false;
         isDead = false;
         isSpinJumping = false;
@@ -90,6 +93,9 @@ class Player extends ActiveEntity
         spinJumpSfx = new Sfx("audio/spinjump.wav");
         landSfx = new Sfx("audio/land.wav");
         gameOverSfx = new Sfx("audio/gameover.wav");
+        wallClimbSfx = new Sfx("audio/wallclimb.wav");
+        ceilingClimbSfx = new Sfx("audio/ceilingclimb.wav");
+        damageSfx = new Sfx("audio/damage.wav");
         name = "player";
     }
 
@@ -102,8 +108,16 @@ class Player extends ActiveEntity
     public override function update()
     {
 
+        if(Input.pressed(Key.ESCAPE))
+        {
+          System.exit(0);
+        }
+
         if(isDead)
         {
+          spinJumpSfx.stop();
+          ceilingClimbSfx.stop();
+          wallClimbSfx.stop();
           sprite.play('dead');
           return;
         }
@@ -142,12 +156,6 @@ class Player extends ActiveEntity
         // CAMERA
         scene.camera.x = centerX - HXP.screen.width/2;
         scene.camera.y = centerY - HXP.screen.height/2;
-
-        // SAVING
-        if(Input.pressed(Key.ESCAPE))
-        {
-          System.exit(0);
-        }
 
         // DEBUG
         if(DEBUG)
@@ -336,6 +344,7 @@ class Player extends ActiveEntity
       if(!invincible)
       {
         health -= damage;
+        damageSfx.play();
         if(health <= 0)
         {
           isDead = true;
@@ -363,6 +372,10 @@ class Player extends ActiveEntity
           if(velY < 0)
           {
             sprite.play('climb');
+            if(!wallClimbSfx.playing)
+            {
+              wallClimbSfx.loop();
+            }
           }
           else
           {
@@ -374,6 +387,10 @@ class Player extends ActiveEntity
           if(velX != 0)
           {
             sprite.play('ceiling-climb');
+            if(!ceilingClimbSfx.playing)
+            {
+              ceilingClimbSfx.loop();
+            }
           }
           else
           {
@@ -410,6 +427,18 @@ class Player extends ActiveEntity
           sprite.play('idle');
           walkSfx.stop();
         }
+      }
+      if(!isSpinJumping)
+      {
+        spinJumpSfx.stop();
+      }
+      if(!isOnCeiling() || velX == 0)
+      {
+        ceilingClimbSfx.stop();
+      }
+      if(!isOnWall() || velY == 0)
+      {
+        wallClimbSfx.stop();
       }
     }
 

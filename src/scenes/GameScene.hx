@@ -17,7 +17,7 @@ class GameScene extends Scene
 
     public override function begin()
     {
-        currentLevel = new Level(Level.WORLD_WIDTH, Level.WORLD_HEIGHT, "spa");
+        currentLevel = new Level(Level.WORLD_WIDTH, Level.WORLD_HEIGHT, "start");
         add(new Entity(0, 0, new Backdrop("graphics/" + currentLevel.levelType + "-background.png")));
         add(new Visuals(true));
         add(new Visuals(false));
@@ -33,8 +33,9 @@ class GameScene extends Scene
 
     public function nextLevel(exitDirection:String)
     {
+      currentLevel.levelMusic.stop();
       removeAll();
-      var levelTypes:Array<String> = ["default", "spa"];
+      var levelTypes:Array<String> = ["default", "spa", "tantrum"];
       currentLevel = new Level(Level.WORLD_WIDTH, Level.WORLD_HEIGHT, levelTypes[Math.round((levelTypes.length - 1) * Math.random())]);
       add(new Entity(0, 0, new Backdrop("graphics/" + currentLevel.levelType + "-background.png")));
       add(new Visuals(true));
@@ -44,6 +45,7 @@ class GameScene extends Scene
       {
         add(entity);
       }
+      add(player);
       if(exitDirection == "left")
       {
         player.x = Math.round(currentLevel.levelWidth * Level.TOTAL_SCALE - player.width * 2);
@@ -60,7 +62,7 @@ class GameScene extends Scene
       {
         player.y = 0;
       }
-      add(player);
+      add(new HUD());
     }
 
 }
