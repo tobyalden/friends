@@ -37,7 +37,7 @@ class Player extends ActiveEntity
 
     public static inline var MOTHER_VISITATION_TIME= 100;
 
-    public static inline var DEBUG = true;
+    public static inline var DEBUG = false;
 
     private var onGround:Bool;
     private var isSpinJumping:Bool;
@@ -105,6 +105,14 @@ class Player extends ActiveEntity
       return true;
     }
 
+    public function stopAllSfx()
+    {
+      walkSfx.stop();
+      spinJumpSfx.stop();
+      ceilingClimbSfx.stop();
+      wallClimbSfx.stop();
+    }
+
     public override function update()
     {
 
@@ -115,9 +123,7 @@ class Player extends ActiveEntity
 
         if(isDead)
         {
-          spinJumpSfx.stop();
-          ceilingClimbSfx.stop();
-          wallClimbSfx.stop();
+          stopAllSfx();
           sprite.play('dead');
           return;
         }

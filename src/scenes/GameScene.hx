@@ -3,6 +3,7 @@ package scenes;
 import com.haxepunk.*;
 import com.haxepunk.graphics.*;
 import entities.*;
+import com.haxepunk.utils.*;
 
 class GameScene extends Scene
 {
@@ -13,6 +14,18 @@ class GameScene extends Scene
     public function new()
     {
         super();
+    }
+
+    public override function update()
+    {
+      super.update();
+      if(Input.pressed(Key.R))
+      {
+        player.stopAllSfx();
+        currentLevel.levelMusic.stop();
+        removeAll();
+        HXP.scene = new GameScene();
+      }
     }
 
     public override function begin()
@@ -29,6 +42,7 @@ class GameScene extends Scene
         player = currentLevel.getPlayer();
         add(player);
         add(new HUD());
+        add(new ResetFlash());
     }
 
     public function nextLevel(exitDirection:String)
