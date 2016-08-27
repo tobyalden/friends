@@ -34,7 +34,8 @@ class GameScene extends Scene
     public function nextLevel(exitDirection:String)
     {
       removeAll();
-      currentLevel = new Level(Level.WORLD_WIDTH, Level.WORLD_HEIGHT, "default");
+      var levelTypes:Array<String> = ["default", "spa"];
+      currentLevel = new Level(Level.WORLD_WIDTH, Level.WORLD_HEIGHT, levelTypes[Math.round((levelTypes.length - 1) * Math.random())]);
       add(new Entity(0, 0, new Backdrop("graphics/" + currentLevel.levelType + "-background.png")));
       add(new Visuals(true));
       add(new Visuals(false));

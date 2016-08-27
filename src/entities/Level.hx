@@ -26,8 +26,8 @@ class Level extends Entity
     public static inline var LEVEL_SCALE = 8;
     public static inline var TOTAL_SCALE = TILE_SIZE * LEVEL_SCALE;
 
-    /*public static inline var DECAY_CHANCE = 0.05;*/
-    public static inline var DECAY_CHANCE = 1;
+    public static inline var DECAY_CHANCE = 0.05;
+    /*public static inline var DECAY_CHANCE = 1;*/
 
     private var map:Array<Array<Int>>;
     private var tiles:Tilemap;
@@ -144,6 +144,7 @@ class Level extends Entity
         mirrorHorizontally();
         connectAndContainAllRooms();
         placeSpikes();
+        placeEnemies();
         tiles = new Tilemap("graphics/spa-tiles.png", levelWidth*TILE_SIZE, levelHeight*TILE_SIZE, TILE_SIZE, TILE_SIZE);
         createBoundaries();
         openSides();
@@ -234,15 +235,26 @@ class Level extends Entity
 
     public function placeEnemies()
     {
-      for(i in 0...30)
+      if(levelType == "default")
       {
-        var openPoint:Point = pickRandomOpenPoint();
-        levelEntities.push(new Hopper(openPoint.x * TILE_SIZE * LEVEL_SCALE, openPoint.y * TILE_SIZE * LEVEL_SCALE));
+        for(i in 0...30)
+        {
+          var openPoint:Point = pickRandomOpenPoint();
+          levelEntities.push(new Hopper(openPoint.x * TILE_SIZE * LEVEL_SCALE, openPoint.y * TILE_SIZE * LEVEL_SCALE));
+        }
+        for(i in 0...10)
+        {
+          var openPoint:Point = pickRandomOpenPoint();
+          levelEntities.push(new Brute(openPoint.x * TILE_SIZE * LEVEL_SCALE, openPoint.y * TILE_SIZE * LEVEL_SCALE));
+        }
       }
-      for(i in 0...10)
+      else if(levelType == "spa")
       {
-        var openPoint:Point = pickRandomOpenPoint();
-        levelEntities.push(new Brute(openPoint.x * TILE_SIZE * LEVEL_SCALE, openPoint.y * TILE_SIZE * LEVEL_SCALE));
+        for(i in 0...20)
+        {
+          var openPoint:Point = pickRandomOpenPoint();
+          levelEntities.push(new PinkBrother(openPoint.x * TILE_SIZE * LEVEL_SCALE, openPoint.y * TILE_SIZE * LEVEL_SCALE));
+        }
       }
     }
 
