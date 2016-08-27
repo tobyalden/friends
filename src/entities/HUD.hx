@@ -1,16 +1,37 @@
 package entities;
 
-import com.haxepunk.*;
-import com.haxepunk.graphics.*;
-import scenes.GameScene;
-import entities.Player;
+import com.haxepunk.Entity;
+import com.haxepunk.graphics.Text;
 
-class HUD extends ActiveEntity
+class HUD extends Entity
 {
 
-    public function new(x:Float, y:Float)
+    private var text:Text;
+
+    public function new()
     {
-      super(x, y);
-      // TODO: Shit;
+      super(0, 0);
+      text = new Text();
+      text.addStyle("health", {color: 0xFFFFFF, size: text.size, bold: true});
+      /*text.addStyle("red", {color: 0xFF0000, size: text.size * 2, bold: true});*/
+      text.setTextProperty('richText', true);
+      text.richText = "<health>100</health>";
+      graphic = text;
+    }
+
+    override public function update()
+    {
+      super.update();
+      var player:Entity = scene.getInstance('player');
+      if(cast(player, Player).isDead)
+      {
+        graphic.visible = false;
+        return;
+      }
+      x = player.centerX - text.textWidth/2;
+      y = player.y - 5;
+      x = player.centerX - text.textWidth/2;
+      y = player.y - 5;
+      text.richText = "<health>" + cast(player, Player).health + "</health>";
     }
 }

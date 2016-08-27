@@ -46,6 +46,7 @@ class Player extends ActiveEntity
     private var jumpSfx:Sfx;
     private var spinJumpSfx:Sfx;
     private var landSfx:Sfx;
+    private var gameOverSfx:Sfx;
 
     private var canDoubleJump:Bool;
 
@@ -53,7 +54,7 @@ class Player extends ActiveEntity
 
     private var stunned:Bool;
     private var lostInThought:Bool;
-    private var isDead:Bool;
+    public var isDead:Bool;
 
     public function new(x:Int, y:Int)
     {
@@ -63,7 +64,7 @@ class Player extends ActiveEntity
         setHitbox(12, 32, -10, -16);
         velX = 0;
         velY = 0;
-        health = 3;
+        health = 20;
         onGround = false;
         isDead = false;
         isSpinJumping = false;
@@ -80,6 +81,7 @@ class Player extends ActiveEntity
         sprite.add("climb", [10, 11], 8);
         sprite.add("ceiling-hang", [12]);
         sprite.add("ceiling-climb", [12, 13], 8);
+        sprite.add("dead", [14]);
         sprite.play("idle");
         graphic = sprite;
         layer = -2550;
@@ -87,6 +89,7 @@ class Player extends ActiveEntity
         jumpSfx = new Sfx("audio/jump.wav");
         spinJumpSfx = new Sfx("audio/spinjump.wav");
         landSfx = new Sfx("audio/land.wav");
+        gameOverSfx = new Sfx("audio/gameover.wav");
         name = "player";
     }
 
@@ -99,6 +102,11 @@ class Player extends ActiveEntity
     public override function update()
     {
 
+        if(isDead)
+        {
+          sprite.play('dead');
+          return;
+        }
         if(onGround != isOnGround())
         {
           onGround = isOnGround();
@@ -331,6 +339,7 @@ class Player extends ActiveEntity
         if(health <= 0)
         {
           isDead = true;
+          gameOverSfx.play();
         }
       }
     }

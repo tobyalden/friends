@@ -28,7 +28,7 @@ class GameScene extends Scene
         }
         player = currentLevel.getPlayer();
         add(player);
-        add(new HUD(0, 0));
+        add(new HUD());
     }
 
     public function nextLevel(exitDirection:String)
