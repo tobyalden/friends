@@ -2,6 +2,7 @@ package entities;
 
 import com.haxepunk.Entity;
 import com.haxepunk.graphics.Text;
+import scenes.*;
 
 class VoiceOfGod extends Entity
 {
@@ -10,15 +11,17 @@ class VoiceOfGod extends Entity
     private var sayings:Array<String>;
     private var sayingsIndex:Int;
     private var sayingsTimer:Int;
+    private var secretSequence:Array<String>;
 
     public static inline var SAYING_INTERVAL = 100;
 
-    public function new(godType:String)
+    public function new(godType:String, secretSequence:Array<String>)
     {
       super(0, 0);
+      this.secretSequence = secretSequence;
       if(godType == "angel")
       {
-        sayings = ["hehe hey there budy..", "today's super sequence is...", "uhh...i fogtget ", "is that helpful tee hee chuckle"];
+        sayings = ["hehe hey there budy..", "today's super \nsequence is...", secretSequence.toString(), "is that helpful", "tee hee chuckle"];
       }
       text = new Text();
       text.addStyle("voice", {color: 0xFFFFFF, size: 100, bold: true, font: "Helvetica"});

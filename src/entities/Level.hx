@@ -44,12 +44,15 @@ class Level extends Entity
 
     public var levelEntities:Array<Entity>;
 
-    public function new(levelWidth:Int, levelHeight:Int, levelType:String)
+    private var pass_secretSequence:Array<String>;
+
+    public function new(levelWidth:Int, levelHeight:Int, levelType:String, secretSequence:Array<String>)
     {
         super(0, 0);
         this.levelWidth = levelWidth;
         this.levelHeight = levelHeight;
         this.levelType = levelType;
+        pass_secretSequence = secretSequence;
         levelMusic = new Sfx('audio/' + levelType + '-music.wav');
         deathMusic = new Sfx('audio/gameover.wav');
         levelMusic.volume = 0.2;
@@ -309,7 +312,7 @@ class Level extends Entity
         {
           var god:God = new God(TOTAL_SCALE * levelWidth / 2, TOTAL_SCALE * levelHeight / 2, "angel");
           levelEntities.push(god);
-          levelEntities.push(new VoiceOfGod(god.godType));
+          levelEntities.push(new VoiceOfGod(god.godType, pass_secretSequence));
         }
     }
 

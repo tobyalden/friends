@@ -50,7 +50,7 @@ class GameScene extends Scene
 
     public override function begin()
     {
-        currentLevel = new Level(Level.WORLD_WIDTH, Level.WORLD_HEIGHT, "start");
+        currentLevel = new Level(Level.WORLD_WIDTH, Level.WORLD_HEIGHT, "start", secretSequence);
         add(new Entity(0, 0, new Backdrop("graphics/" + currentLevel.levelType + "-background.png")));
         add(new Visuals(true));
         add(new Visuals(false));
@@ -70,7 +70,7 @@ class GameScene extends Scene
       currentLevel.levelMusic.stop();
       removeAll();
       var levelTypes:Array<String> = ["default", "spa", "tantrum"];
-      currentLevel = new Level(Level.WORLD_WIDTH, Level.WORLD_HEIGHT, levelTypes[Math.round((levelTypes.length - 1) * Math.random())]);
+      currentLevel = new Level(Level.WORLD_WIDTH, Level.WORLD_HEIGHT, levelTypes[Math.round((levelTypes.length - 1) * Math.random())], secretSequence);
       add(new Entity(0, 0, new Backdrop("graphics/" + currentLevel.levelType + "-background.png")));
       add(new Visuals(true));
       add(new Visuals(false));
