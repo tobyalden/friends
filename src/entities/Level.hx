@@ -27,7 +27,7 @@ class Level extends Entity
     public static inline var LEVEL_SCALE = 8;
     public static inline var TOTAL_SCALE = TILE_SIZE * LEVEL_SCALE;
 
-    public static inline var DECAY_CHANCE = 0.05;
+    public static inline var DECAY_CHANCE = 0.00;
     /*public static inline var DECAY_CHANCE = 1;*/
 
     private var map:Array<Array<Int>>;
@@ -51,7 +51,7 @@ class Level extends Entity
         this.levelHeight = levelHeight;
         this.levelType = levelType;
         levelMusic = new Sfx('audio/' + levelType + '-music.wav');
-        deathMusic = new Sfx('audio/death-music.wav');
+        deathMusic = new Sfx('audio/gameover.wav');
         levelMusic.volume = 0.2;
         levelMusic.play();
         levelEntities = new Array<Entity>();
@@ -140,6 +140,7 @@ class Level extends Entity
         connectAndContainAllRooms();
         createBoundaries();
         openSides();
+        placeGod();
         tiles = new Tilemap("graphics/start-tiles.png", levelWidth*TILE_SIZE, levelHeight*TILE_SIZE, TILE_SIZE, TILE_SIZE);
         prettifyMap();
       }
@@ -174,6 +175,15 @@ class Level extends Entity
         coverFloorWithSpikes();
         placeEnemies();
         tiles = new Tilemap("graphics/tantrum-tiles.png", levelWidth*TILE_SIZE, levelHeight*TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        createBoundaries();
+        openSides();
+        prettifyMap();
+      }
+      else if(levelType == "velvet")
+      {
+        randomizeMap();
+        connectAndContainAllRooms();
+        tiles = new Tilemap("graphics/velvet-tiles.png", levelWidth*TILE_SIZE, levelHeight*TILE_SIZE, TILE_SIZE, TILE_SIZE);
         createBoundaries();
         openSides();
         prettifyMap();
@@ -291,6 +301,16 @@ class Level extends Entity
           levelEntities.push(new LustDemon(openPoint.x * TILE_SIZE * LEVEL_SCALE, openPoint.y * TILE_SIZE * LEVEL_SCALE));
         }*/
       }
+    }
+
+    public function placeGod()
+    {
+        if(levelType == "start")
+        {
+          var god:God = new God(TOTAL_SCALE * levelWidth / 2, TOTAL_SCALE * levelHeight / 2, "angel");
+          levelEntities.push(god);
+          levelEntities.push(new VoiceOfGod(god.godType));
+        }
     }
 
     public function connectAndContainAllRooms()

@@ -11,9 +11,27 @@ class GameScene extends Scene
     private var currentLevel:Level;
     private var player:Player;
 
+    public var screenSequence:Array<String>;
+    public var secretSequence:Array<String>;
+
     public function new()
     {
         super();
+        resetSequences();
+    }
+
+    private function resetSequences() {
+      screenSequence = new Array<String>();
+      secretSequence = new Array<String>();
+      var options:Array<String> = ["top", "bottom", "right", "left"];
+      for (i in 0...4)
+      {
+        secretSequence.push(
+            options[Math.round(Math.random() * (options.length - 1))]
+        );
+      }
+      trace("Today's super sequence is: " + secretSequence);
+
     }
 
     public override function update()
@@ -23,8 +41,10 @@ class GameScene extends Scene
       {
         player.stopAllSfx();
         currentLevel.levelMusic.stop();
+        currentLevel.deathMusic.stop();
         removeAll();
         HXP.scene = new GameScene();
+        resetSequences();
       }
     }
 
@@ -55,11 +75,24 @@ class GameScene extends Scene
       add(new Visuals(true));
       add(new Visuals(false));
       add(currentLevel);
+
       for(entity in currentLevel.levelEntities)
       {
         add(entity);
       }
       add(player);
+      screenSequence.push(exitDirection);
+      if(screenSequence.length > 4)
+      {
+        screenSequence.reverse();
+        screenSequence.pop();
+        screenSequence.reverse();
+      }
+      if(screenSequence.toString() == secretSequence.toString())
+      {
+        trace("U win!");
+      }
+
       if(exitDirection == "left")
       {
         player.x = Math.round(currentLevel.levelWidth * Level.TOTAL_SCALE - player.width * 2);

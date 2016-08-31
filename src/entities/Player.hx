@@ -37,7 +37,7 @@ class Player extends ActiveEntity
 
     public static inline var MOTHER_VISITATION_TIME= 100;
 
-    public static inline var DEBUG = false;
+    public static inline var DEBUG = true;
 
     private var onGround:Bool;
     private var isSpinJumping:Bool;
@@ -46,7 +46,6 @@ class Player extends ActiveEntity
     private var jumpSfx:Sfx;
     private var spinJumpSfx:Sfx;
     private var landSfx:Sfx;
-    private var gameOverSfx:Sfx;
     private var ceilingClimbSfx:Sfx;
     private var wallClimbSfx:Sfx;
     private var damageSfx:Sfx;
@@ -92,7 +91,6 @@ class Player extends ActiveEntity
         jumpSfx = new Sfx("audio/jump.wav");
         spinJumpSfx = new Sfx("audio/spinjump.wav");
         landSfx = new Sfx("audio/land.wav");
-        gameOverSfx = new Sfx("audio/gameover.wav");
         wallClimbSfx = new Sfx("audio/wallclimb.wav");
         ceilingClimbSfx = new Sfx("audio/ceilingclimb.wav");
         damageSfx = new Sfx("audio/damage.wav");
@@ -354,7 +352,6 @@ class Player extends ActiveEntity
         if(health <= 0)
         {
           isDead = true;
-          gameOverSfx.play();
         }
       }
     }
